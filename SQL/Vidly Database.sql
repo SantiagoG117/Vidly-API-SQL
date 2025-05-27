@@ -1,9 +1,9 @@
-# Create the Schema
+-- Create the Schema
 DROP DATABASE IF EXISTS vidly;
 CREATE DATABASE vidly;
 USE vidly;
 
-# Create the Tables
+-- Create the Tables
 DROP TABLE IF EXISTS users;
 CREATE TABLE IF NOT EXISTS users (
 	user_id	INT PRIMARY KEY AUTO_INCREMENT,
@@ -22,18 +22,18 @@ CREATE TABLE IF NOT EXISTS customers (
     points 			INT NOT NULL DEFAULT 0 
 );
 
-# Parent of the genres-movies relationship. A genre can have many movies (a genre exists independently of movies)
+-- Parent of the genres-movies relationship. A genre can have many movies (a genre exists independently of movies)
 DROP TABLE IF EXISTS genres;
 CREATE TABLE IF NOT EXISTS genres (
 	genre_id	INT PRIMARY KEY AUTO_INCREMENT,
     name		Varchar(100)
 );
 
-# Child of the genre-movies relationship: Each movie belongs to one genre (a movie depends on a genre to exist)
+-- Child of the genre-movies relationship: Each movie belongs to one genre (a movie depends on a genre to exist)
 DROP TABLE IF EXISTS movies;
 CREATE TABLE IF NOT EXISTS movies (
 	movie_id			INT PRIMARY KEY AUTO_INCREMENT,
-    genre_id			INT NOT NULL, #Parent digital DNA
+    genre_id			INT NOT NULL, --Parent digital DNA
     title 				VARCHAR(50) NOT NULL,
     daily_rental_rate 	INT NOT NULL,
     number_in_stock		INT NOT NULL,
