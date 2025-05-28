@@ -1,1 +1,0 @@
-const sqlConnection = require('./dbconnection')

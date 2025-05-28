@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS genres (
 DROP TABLE IF EXISTS movies;
 CREATE TABLE IF NOT EXISTS movies (
 	movie_id			INT PRIMARY KEY AUTO_INCREMENT,
-    genre_id			INT NOT NULL, --Parent digital DNA
+    genre_id			INT NOT NULL, # Parent digital DNA
     title 				VARCHAR(50) NOT NULL,
     daily_rental_rate 	INT NOT NULL,
     number_in_stock		INT NOT NULL,
@@ -78,6 +78,23 @@ CREATE TABLE IF NOT EXISTS rentals (
     ON DELETE NO ACTION
 );
 
+-- Insert statements
 
+INSERT INTO genres (name) VALUES 
+  ('Action'),
+  ('Adventure'),
+  ('Animation'),
+  ('Comedy'),
+  ('Crime'),
+  ('Documentary'),
+  ('Drama'),
+  ('Family'),
+  ('Fantasy'),
+  ('Horror'),
+  ('Mystery'),
+  ('Romance'),
+  ('Science Fiction'),
+  ('Thriller'),
+  ('War');
 
 
