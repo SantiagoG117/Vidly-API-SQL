@@ -1,8 +1,8 @@
-const sqlConnection = require("./dbconnection");
+//? Get the connection to the Database
+const connection = require("./dbconnection");
 
 /* 
-    TODO: Build a model for the Genres entity
-    This class builds a Model that represents an interface to interact with a the genres Database Entity.
+    This class builds an interface to interact with the genres Database Entity.
     It allows us to implement CRUD operations on said entity
 */
 
@@ -10,8 +10,7 @@ class Genres {
   //? Prototype methods
   async getGenres() {
     try {
-      const [result] = await sqlConnection.query(`SELECT* FROM genres;`); //Extracts the rows and save them in an array of objects
-      console.log(result);
+      const [result] = await connection.query(`SELECT* FROM genres;`); //Extracts the rows and save them in an array of objects
       return result;
     } catch (ex) {
       console.log("An error occured while querying the database: ", ex);
@@ -20,7 +19,7 @@ class Genres {
 
   async getGenre(id) {
     try {
-      const [result] = await sqlConnection.query(
+      const [result] = await connection.query(
         `SELECT* FROM genres WHERE genre_id = ?;`,
         [id] //Parameterized query
       );

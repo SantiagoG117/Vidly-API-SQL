@@ -6,8 +6,7 @@ const router = express.Router();
 const genresModel = require("../SQL/genresModel");
 
 /* 
-    TODO:
-        ! Add middleware error handling
+    TODO: Add middleware error handling
 */
 
 //? Routes
