@@ -38,7 +38,7 @@ class Customers {
     }
   }
 
-  async updateUser(userId, firstName, lastName, email, phone, points) {
+  async updateCustomer(userId, firstName, lastName, email, phone, points) {
     try {
       const [[result]] = await connection.query(
         `CALL update_customer(?,?,?,?,?,?)`,

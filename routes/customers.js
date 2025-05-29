@@ -49,17 +49,17 @@ router.put("/:id", async (req, res) => {
   const { error } = Customers.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  // Verify that the customer exist
-  const validId = await Customers.getCustomer(req.params.id);
-  const customerExist = await searchCustomer(req);
+  // Verify that the customer exist and the id is valid
+  const [validId] = await Customers.getCustomer(req.params.id);
+  const customer = await searchCustomer(req);
 
-  if (!customerExist || validId.length === 0)
+  if (!customer || !validId)
     return res
       .status(404)
       .send("There is no customer under the provided phone number or Id");
 
   // Update the customer
-  const result = await Customers.updateUser(
+  const result = await Customers.updateCustomer(
     req.params.id,
     req.body.firstName,
     req.body.lastName,
