@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS customers (
     first_name 		VARCHAR(50) NOT NULL,
     last_name 		VARCHAR(50) NOT NULL,
     email 			VARCHAR(255) UNIQUE,
-    phone 			VARCHAR(50),
+    phone 			VARCHAR(50) NOT NULL UNIQUE,
     points 			INT NOT NULL DEFAULT 0 
 );
 
@@ -165,9 +165,6 @@ BEGIN
 	-- Variables
     DECLARE new_movie_id INT;
     
-    -- Validate inputs
-    
-    
     -- Verify if the genre exist:
     IF EXISTS(SELECT 1 FROM genres WHERE genre_id = p_genre_id) THEN
 		INSERT INTO movies (genre_id, title, daily_rental_rate, number_in_stock)
@@ -249,3 +246,86 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS create_customer;
+DELIMITER $$
+
+CREATE PROCEDURE create_customer
+(
+   IN p_first_name	VARCHAR(50),
+   IN p_last_name	VARCHAR(50),
+   IN p_email		VARCHAR(255),
+   IN p_phone		VARCHAR(50),
+   IN p_points		INT 
+)
+BEGIN
+	-- Variables
+    DECLARE new_customer_id INT;
+
+	INSERT INTO customers (first_name, last_name, email, phone, points) VALUES(p_first_name, p_last_name, p_email, p_phone, p_points );
+	
+    SET new_customer_id = last_insert_id();
+    SELECT* FROM customers where customer_id = new_customer_id;
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS update_customer;
+DELIMITER $$
+CREATE PROCEDURE update_customer
+(
+	IN p_customer_id INT,
+    IN p_first_name VARCHAR(50),
+    IN p_last_name VARCHAR(50),
+    IN p_email VARCHAR(50),
+    IN p_phone VARCHAR(50),
+    IN p_points INT
+)
+BEGIN
+	-- Verify that the customer exists
+    IF EXISTS(SELECT 1 FROM customers WHERE customer_id = p_customer_id) THEN
+		UPDATE customers
+        SET first_name = p_first_name, last_name = p_last_name, email = p_email, phone = p_phone, points = p_points
+        WHERE customer_id = p_customer_id;
+        
+        SELECT* FROM customers WHERE customer_id = p_customer_id;
+	ELSE 
+		SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid customer_id';
+    END IF;
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS delete_customer;
+DELIMITER $$
+CREATE PROCEDURE delete_customer
+(
+	p_customer_id	INT
+)
+BEGIN
+	-- create temporary table to store the deleted customer
+    CREATE TEMPORARY TABLE IF NOT EXISTS temp_customer AS
+		SELECT* FROM customers WHERE 1=0; -- Copies the structure of the customers table without copying its data
+
+	IF EXISTS (SELECT 1 FROM customers WHERE customer_id = p_customer_id) THEN
+		
+        -- Store the customer to be deleted
+        INSERT INTO temp_customer
+		SELECT * FROM customers WHERE customer_id = p_customer_id;
+        
+        -- Delete the target customer
+        DELETE FROM customers WHERE customer_id = p_customer_id;
+        
+        SELECT* FROM temp_customer;
+        DROP TEMPORARY TABLE IF EXISTS temp_customer;
+	ELSE
+		SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid customer id';
+    END IF;
+END $$
+
+DELIMITER ;
+
+
+

@@ -1,6 +1,7 @@
 //? Get the connection to the Database
 const connection = require("./dbconnection");
 
+//? External libraries
 const Joi = require("joi");
 
 /* 
@@ -24,7 +25,7 @@ class Movies {
     try {
       const [result] = await connection.query(
         `SELECT* FROM movies WHERE movie_id = ?`,
-        [id] //Parameterized query
+        [id] 
       );
       return result;
     } catch (ex) {

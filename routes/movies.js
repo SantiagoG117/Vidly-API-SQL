@@ -33,9 +33,9 @@ router.post("/", async (req, res) => {
 
   //Ensure that the movie does not already exist
   const movies = await moviesModel.getAllMovies();
-  const result = movies.find((movie) => movie.title === req.body.title);
-  console.log(result);
-  if (result)
+  const movieExist = movies.find((movie) => movie.title === req.body.title);
+  
+  if (movieExist)
     return res.status(400).send("Movie already exists on our servers");
 
   const [movie] = await moviesModel.createMovie(
@@ -59,7 +59,7 @@ router.put("/:id", async (req, res) => {
   const { error } = moviesModel.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  //Update the
+  //Update the movie
   const [result] = await moviesModel.updateMovie(
     req.params.id,
     req.body.genreId,
