@@ -25,7 +25,7 @@ class Movies {
     try {
       const [result] = await connection.query(
         `SELECT* FROM movies WHERE movie_id = ?`,
-        [id] 
+        [id]
       );
       return result;
     } catch (ex) {
@@ -33,10 +33,11 @@ class Movies {
     }
   }
 
-  async createMovie(genreId, title, dailyRentalRate, numberInStock) {
+  async createMovie(genreId, barcode, title, dailyRentalRate, numberInStock) {
     try {
-      const [result] = await connection.query(`CALL insert_movie(?,?,?,?)`, [
+      const [result] = await connection.query(`CALL insert_movie(?,?,?,?,?)`, [
         genreId,
+        barcode,
         title,
         dailyRentalRate,
         numberInStock,
@@ -47,11 +48,12 @@ class Movies {
     }
   }
 
-  async updateMovie(movieId, genreId, title, numberInStock, dailyRentalRate) {
+  async updateMovie(movieId, genreId, barcode ,title, numberInStock, dailyRentalRate) {
     try {
-      const [result] = await connection.query(`CALL update_movie(?,?,?,?,?)`, [
+      const [result] = await connection.query(`CALL update_movie(?,?,?,?,?,?)`, [
         movieId,
         genreId,
+        barcode,
         title,
         numberInStock,
         dailyRentalRate,
@@ -78,6 +80,7 @@ class Movies {
     const schema = Joi.object({
       genreId: Joi.number().min(0).required(),
       title: Joi.string().min(1).max(255).required(),
+      barcode: Joi.string().min(10).max(10).required(),
       numberInStock: Joi.number().min(0).required(),
       dailyRentalRate: Joi.number().min(0).required(),
     });

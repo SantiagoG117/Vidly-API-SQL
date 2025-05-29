@@ -27,18 +27,18 @@ router.get("/:id", async (req, res) => {
 
 //POST
 router.post("/", async (req, res) => {
-  //Validate the object send by the client
+  //Validate the object sent by the client
   const { error } = moviesModel.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   //Ensure that the movie does not already exist
   const movieExist = await searchMovie(req);
-
   if (movieExist)
     return res.status(400).send("Movie already exists on our servers");
 
   const [movie] = await moviesModel.createMovie(
     req.body.genreId,
+    req.body.barcode,
     req.body.title,
     req.body.dailyRentalRate,
     req.body.numberInStock
@@ -70,6 +70,7 @@ router.put("/:id", async (req, res) => {
   const [result] = await moviesModel.updateMovie(
     req.params.id,
     req.body.genreId,
+    req.body.barcode,
     req.body.title,
     req.body.dailyRentalRate,
     req.body.numberInStock
