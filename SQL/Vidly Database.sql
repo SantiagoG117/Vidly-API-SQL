@@ -6,10 +6,12 @@ USE vidly;
 -- Create the Tables ------------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS users;
 CREATE TABLE IF NOT EXISTS users (
-	user_id	INT PRIMARY KEY AUTO_INCREMENT,
+	user_id		INT PRIMARY KEY AUTO_INCREMENT,
     first_name	VARCHAR(50) NOT NULL,
     last_name	VARCHAR(50) NOT NULL,
-    password	VARCHAR(300) NOT NULL
+    email		VARCHAR(255) UNIQUE,
+    password	VARCHAR(255) NOT NULL,
+    is_admin	BOOLEAN NOT NULL
 );
 
 DROP TABLE IF EXISTS customers;
@@ -47,12 +49,14 @@ CREATE TABLE IF NOT EXISTS movies (
 
 DROP TABLE IF EXISTS rentals;
 CREATE TABLE IF NOT EXISTS rentals (
-	rental_id	INT PRIMARY KEY AUTO_INCREMENT,
-    customer_id	INT NOT NULL,
-    movie_id	INT NOT NULL,
-    date_out	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    date_in		DATETIME NULL,
-    rental_fee	DECIMAL(5,2) NOT NULL,
+	rental_id		INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id		INT NOT NULL,
+    movie_id		INT NOT NULL,
+    movie_barcode	CHAR(10) NOT NULL,
+    date_out 		DATE NOT NULL DEFAULT (CURRENT_DATE),
+    date_in			DATETIME NULL,
+    rental_fee		DECIMAL(5,2) NULL,
+	is_returned     BOOLEAN NULL,
     
     FOREIGN KEY fk_rentals_customers  (customer_id)
     REFERENCES customers(customer_id)
@@ -144,7 +148,7 @@ DELIMITER $$
 CREATE PROCEDURE insert_movie
 (
 	IN p_genre_id INT,
-     barcode				CHAR(10)
+    IN p_barcode CHAR(10),
     IN p_title VARCHAR(255),
     IN p_daily_rental_rate DECIMAL(5,2),
     IN p_number_in_stock INT
@@ -155,8 +159,8 @@ BEGIN
     
     -- Verify if the genre exist:
     IF EXISTS(SELECT 1 FROM genres WHERE genre_id = p_genre_id) THEN
-		INSERT INTO movies (genre_id, title, daily_rental_rate, number_in_stock)
-        VALUES (p_genre_id, p_title, p_daily_rental_rate, p_number_in_stock);
+		INSERT INTO movies (genre_id, barcode ,title, daily_rental_rate, number_in_stock)
+        VALUES (p_genre_id, p_barcode ,p_title, p_daily_rental_rate, p_number_in_stock);
         
         SET new_movie_id = last_insert_id();
         SELECT * FROM movies WHERE movie_id= new_movie_id;
@@ -175,6 +179,7 @@ CREATE PROCEDURE update_movie
 (
     IN p_movie_id INT,
     IN p_genre_id INT,
+    IN p_barcode CHAR(10),
     IN p_title VARCHAR(255),
     IN p_daily_rental_rate DECIMAL(5,2),
     IN p_number_in_stock INT
@@ -186,6 +191,7 @@ BEGIN
 
         UPDATE movies 
         SET genre_id = p_genre_id, 
+			barcode = p_barcode,
             title = p_title, 
             daily_rental_rate = p_daily_rental_rate, 
             number_in_stock = p_number_in_stock
@@ -312,7 +318,112 @@ BEGIN
         SET MESSAGE_TEXT = 'Invalid customer id';
     END IF;
 END $$
+DELIMITER ;
 
+DROP PROCEDURE IF EXISTS create_movie_rental;
+DELIMITER $$
+CREATE PROCEDURE create_movie_rental
+(
+    IN p_customer_id	INT,
+    IN p_movie_id		INT,
+    IN p_barcode		CHAR(10)
+)
+BEGIN
+	-- Variables
+    DECLARE new_rental_id INT;
+	-- Validate the customer_id and movie_id
+    IF EXISTS(SELECT 1 FROM customers WHERE customer_id = p_customer_id) 
+    AND EXISTS(SELECT 1 FROM movies WHERE movie_id = p_movie_id) THEN
+    
+		-- Create the rental
+		INSERT INTO rentals (customer_id, movie_id, movie_barcode)
+		VALUES (p_customer_id, p_movie_id, p_barcode);
+        
+        -- Decrease the number in stock of the targeted movie by 1
+		UPDATE movies
+        SET number_in_stock = number_in_stock - 1
+        WHERE movie_id = p_movie_id;
+        
+        -- Return the created rental
+		SET new_rental_id = last_insert_id();
+		SELECT* FROM rentals where rental_id = new_rental_id;
+    ELSE
+		SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid movie_id or customer_id';
+	END IF;
+END $$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS create_movie_return;
+DELIMITER $$
+CREATE PROCEDURE create_movie_return
+(
+	IN p_customer_id	INT,
+    IN p_movie_id		INT
+)
+BEGIN
+	DECLARE v_date_out	DATE;
+	DECLARE days_rented INT;
+    DECLARE movie_rental_fee DECIMAL(5,2);
+    
+	-- Verify that the customer and movie exist
+	IF EXISTS(SELECT 1 FROM customers WHERE customer_id = p_customer_id) 
+    AND EXISTS(SELECT 1 FROM movies WHERE movie_id = p_movie_id) THEN
+		
+        
+        SELECT date_out INTO v_date_out 
+        FROM rentals 
+        WHERE (customer_id = p_customer_id) AND (movie_id = p_movie_id) AND ( date_in IS NULL) AND (rental_fee IS NULL)
+        LIMIT 1;
+        
+        SELECT daily_rental_rate INTO movie_rental_fee 
+        FROM movies 
+        WHERE movie_id = p_movie_id;
+        
+        SET days_rented = DATEDIFF(CURDATE(), v_date_out);
+        
+        UPDATE rentals
+        SET date_in = CURDATE(), rental_fee = movie_rental_fee * days_rented , is_returned = TRUE
+        WHERE (customer_id = p_customer_id) AND (movie_id = p_movie_id) AND (rental_fee IS NULL) AND (is_returned IS NULL);
+        
+        -- Increase the number of stock for the targeted movie by 1
+		UPDATE movies
+        SET number_in_stock = number_in_stock + 1
+        WHERE movie_id = p_movie_id;
+        
+        -- Return the created rental
+        SELECT* FROM rentals WHERE (customer_id = p_customer_id) AND (movie_id = p_movie_id) AND (date_in = CURDATE());
+        
+	ELSE 
+		SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid customer_id or movie_id';
+    END IF;
+
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS register_user;
+DELIMITER $$
+CREATE PROCEDURE register_user
+(
+	IN p_first_name	VARCHAR(50),
+    IN p_last_name	VARCHAR(50),
+    IN p_email		VARCHAR(255),
+    IN p_password	VARCHAR(1025),
+    IN p_is_admin	BOOLEAN
+)
+BEGIN
+	-- Variables
+    DECLARE new_user_id INT;
+
+	INSERT INTO users (first_name, last_name, email, password, is_admin)
+    VALUES (p_first_name, p_last_name, p_email, p_password, p_is_admin);
+    
+    SET new_user_id = last_insert_id();
+    SELECT* FROM users WHERE user_id = new_user_id;
+    
+END $$
 DELIMITER ;
 
 

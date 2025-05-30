@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
 
 //GET one
 router.get("/:id", async (req, res) => {
-  const movie = await moviesModel.getMovie(req.params.id);
+  const movie = await moviesModel.getMovieById(req.params.id);
   if (movie.length === 0)
     return res.status(404).send("There is no movie under the provided id");
 
@@ -59,7 +59,7 @@ router.put("/:id", async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // Verify that the movie exist and the id is valid
-  const [validID] = await moviesModel.getMovie(req.params.id);
+  const [validID] = await moviesModel.getMovieById(req.params.id);
 
   if (!validID)
     return res
@@ -84,7 +84,7 @@ router.put("/:id", async (req, res) => {
 // DELETE
 router.delete("/:id", async (req, res) => {
   //Verify the movie exists
-  let [result] = await moviesModel.getMovie(req.params.id);
+  let [result] = await moviesModel.getMovieById(req.params.id);
 
   if (!result)
     return res.status(404).send("There is no movie under the provided id");
@@ -94,9 +94,10 @@ router.delete("/:id", async (req, res) => {
   res.send(result);
 });
 
-module.exports = router;
 async function searchMovie(req) {
   const movies = await moviesModel.getAllMovies();
   const movieExist = movies.find((movie) => movie.title === req.body.title);
   return movieExist;
 }
+
+module.exports = router;

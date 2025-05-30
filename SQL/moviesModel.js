@@ -21,7 +21,7 @@ class Movies {
     }
   }
 
-  async getMovie(id) {
+  async getMovieById(id) {
     try {
       const [result] = await connection.query(
         `SELECT* FROM movies WHERE movie_id = ?`,
@@ -30,6 +30,18 @@ class Movies {
       return result;
     } catch (ex) {
       console.log("An error occured while querying the database: ", ex);
+    }
+  }
+
+  async getMovieByBarcode(barcode) {
+    try {
+      const [result] = await connection.query(
+        "SELECT* FROM movies WHERE barcode = ? ",
+        [barcode]
+      );
+      return result;
+    } catch (ex) {
+      console.log("Error", ex);
     }
   }
 
@@ -48,16 +60,19 @@ class Movies {
     }
   }
 
-  async updateMovie(movieId, genreId, barcode ,title, numberInStock, dailyRentalRate) {
+  async updateMovie(
+    movieId,
+    genreId,
+    barcode,
+    title,
+    numberInStock,
+    dailyRentalRate
+  ) {
     try {
-      const [result] = await connection.query(`CALL update_movie(?,?,?,?,?,?)`, [
-        movieId,
-        genreId,
-        barcode,
-        title,
-        numberInStock,
-        dailyRentalRate,
-      ]);
+      const [result] = await connection.query(
+        `CALL update_movie(?,?,?,?,?,?)`,
+        [movieId, genreId, barcode, title, numberInStock, dailyRentalRate]
+      );
       return result[0];
     } catch (ex) {
       console.log("An error occurred while calling the stored procedure: ", ex);
