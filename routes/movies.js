@@ -8,6 +8,7 @@ const moviesModel = require("../SQL/moviesModel");
 //? Import third party libraries and middleware
 const lodash = require("lodash");
 const authorization = require("../middleware/authorization");
+const isAdmin = require("../middleware/adminAuthorization");
 
 //? Add routes:
 //GET
@@ -26,7 +27,7 @@ router.get("/:id", authorization, async (req, res) => {
 });
 
 //POST
-router.post("/", async (req, res) => {
+router.post("/", [authorization, isAdmin], async (req, res) => {
   //Validate the object sent by the client
   const { error } = moviesModel.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -53,7 +54,7 @@ router.post("/", async (req, res) => {
 });
 
 //PUT
-router.put("/:id", async (req, res) => {
+router.put("/:id", [authorization, isAdmin], async (req, res) => {
   //Validate the object
   const { error } = moviesModel.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -82,7 +83,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // DELETE
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [authorization, isAdmin], async (req, res) => {
   //Verify the movie exists
   let [result] = await moviesModel.getMovieById(req.params.id);
 

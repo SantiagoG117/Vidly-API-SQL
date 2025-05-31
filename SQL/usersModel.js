@@ -7,6 +7,15 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 class Users {
+  async getAllUsers() {
+    try {
+      const [result] = await connection.query("SELECT * FROM users");
+      return result;
+    } catch (ex) {
+      console.log("An error occurred in the database ", ex);
+    }
+  }
+
   async getUser(email) {
     try {
       const [result] = await connection.query(

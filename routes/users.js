@@ -11,6 +11,12 @@ const bcrypt = require("bcrypt");
 
 //? Routes
 
+//GET
+router.get("/", async (req, res) => {
+  const users = await Users.getAllUsers();
+  res.send(users);
+});
+
 //User registration:
 router.post("/", async (req, res) => {
   const { error } = Users.validate(req.body);

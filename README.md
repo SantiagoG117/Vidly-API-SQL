@@ -19,7 +19,6 @@ Permissions:
 We need different levels of permissions for different users.
   Admins:
     - Can add/update/delete a movie and modify its stock and daily rental rate
-    - Can add/update/delete a genre. 
     - Can add/update a rental.
     - Can add/update/delete a customer.
 

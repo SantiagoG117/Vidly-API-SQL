@@ -18,6 +18,7 @@ function authorization(req, res, next) {
 
   //Verify if the token is valid.
   try {
+    //Extract the decoded payload
     const payload = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
     //Attach the decoded payload to the req body
     req.user = payload;

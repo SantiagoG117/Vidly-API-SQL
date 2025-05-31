@@ -8,6 +8,7 @@ const Customers = require("../SQL/customersModel");
 //? Third party libraries and middleware
 const lodash = require("lodash");
 const authorization = require("../middleware/authorization");
+const isAdmin = require("../middleware/adminAuthorization");
 
 //? Routes
 
@@ -75,7 +76,7 @@ router.put("/:id", authorization, async (req, res) => {
 });
 
 //DELETE
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [authorization, isAdmin], async (req, res) => {
   const customerExist = await Customers.getCustomer(req.params.id);
   if (customerExist.length === 0)
     return res.status(404).send("There is no customer under the provided id");
