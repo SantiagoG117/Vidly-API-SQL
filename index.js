@@ -4,8 +4,6 @@ const app = express();
 
 /* 
     TODO:
-    ! Add authentication and authorization 
-    ! Add error handling middleware
     ! Build front end
 */
 
@@ -19,6 +17,7 @@ const customers = require("./routes/customers");
 const rentals = require("./routes/rentals");
 const users = require("./routes/users");
 const logins = require("./routes/login");
+const error = require("./middleware/errorHandler");
 
 //? Register middleware functions and routers
 app.use(express.json()); //Takes requests and parse their body into a JSON object
@@ -28,6 +27,8 @@ app.use("/api/customers", customers);
 app.use("/api/rentals", rentals);
 app.use("/api/users", users);
 app.use("/api/login", logins);
+//Error middleware: Must be declared at the end so route handlers can pass control to it in case of errors
+app.use(error);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}`));

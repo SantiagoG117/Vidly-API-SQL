@@ -13,7 +13,7 @@ class Genres {
       const [result] = await connection.query(`SELECT* FROM genres;`); //Extracts the rows and save them in an array of objects
       return result;
     } catch (ex) {
-      console.log("An error occured while querying the database: ", ex);
+      throw ex; //Pass the error to the route handler
     }
   }
 
@@ -25,7 +25,7 @@ class Genres {
       );
       return result;
     } catch (ex) {
-      console.log("An error occured while querying the database: ", ex);
+      throw ex;
     }
   }
 }

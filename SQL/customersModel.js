@@ -10,7 +10,7 @@ class Customers {
       const [result] = await connection.query(`SELECT* FROM customers`);
       return result;
     } catch (ex) {
-      console.log(ex);
+      throw ex;
     }
   }
 
@@ -22,7 +22,7 @@ class Customers {
       );
       return result;
     } catch (ex) {
-      console.log(ex);
+      throw ex;
     }
   }
 
@@ -34,7 +34,7 @@ class Customers {
       );
       return result[0];
     } catch (ex) {
-      console.log("An error occured while querying the database: ", ex);
+      throw ex;
     }
   }
 
@@ -47,7 +47,7 @@ class Customers {
 
       return result[0];
     } catch (ex) {
-      console.log("An error occured while querying the database: ", ex);
+      throw ex;
     }
   }
 
@@ -58,7 +58,7 @@ class Customers {
       ]);
       return result[0];
     } catch (ex) {
-      console.log("An error occured while querying the database: ", ex);
+      throw ex;
     }
   }
 

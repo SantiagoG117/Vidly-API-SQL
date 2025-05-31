@@ -12,7 +12,7 @@ class Users {
       const [result] = await connection.query("SELECT * FROM users");
       return result;
     } catch (ex) {
-      console.log("An error occurred in the database ", ex);
+      throw ex;
     }
   }
 
@@ -24,7 +24,7 @@ class Users {
       );
       return result[0];
     } catch (ex) {
-      console.log(ex);
+      throw ex;
     }
   }
 
@@ -37,7 +37,7 @@ class Users {
 
       return result[0];
     } catch (ex) {
-      console.log(ex);
+      throw ex;
     }
   }
 

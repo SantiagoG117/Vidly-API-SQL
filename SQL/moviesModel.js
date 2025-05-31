@@ -4,20 +4,13 @@ const connection = require("./dbconnection");
 //? External libraries
 const Joi = require("joi");
 
-/* 
-    This class builds an interface to interact with the Movies Database Entity. 
-    It allows us to execute CRUD operations on said entity
-
-    TODO: Provide a better validation for a sql error
-*/
-
 class Movies {
   async getAllMovies() {
     try {
       const [result] = await connection.query(`SELECT* FROM movies;`);
       return result;
     } catch (ex) {
-      console.log("An error occured while querying the database: ", ex);
+      throw ex;
     }
   }
 
@@ -29,7 +22,7 @@ class Movies {
       );
       return result;
     } catch (ex) {
-      console.log("An error occured while querying the database: ", ex);
+      throw ex;
     }
   }
 
@@ -41,7 +34,7 @@ class Movies {
       );
       return result;
     } catch (ex) {
-      console.log("Error", ex);
+      throw ex;
     }
   }
 
@@ -56,7 +49,7 @@ class Movies {
       ]);
       return result[0];
     } catch (ex) {
-      console.log("An error occurred while calling the stored procedure: ", ex);
+      throw ex;
     }
   }
 
@@ -75,7 +68,7 @@ class Movies {
       );
       return result[0];
     } catch (ex) {
-      console.log("An error occurred while calling the stored procedure: ", ex);
+      throw ex;
     }
   }
 
@@ -86,7 +79,7 @@ class Movies {
       ]);
       return result[0];
     } catch (ex) {
-      console.log("An error occurred while calling the stored procedure: ", ex);
+      throw ex;
     }
   }
 

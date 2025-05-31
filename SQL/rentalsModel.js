@@ -4,20 +4,13 @@ const connection = require("./dbconnection");
 //? External libraries
 const Joi = require("joi");
 
-/* 
-    TODO: 
-    ! calculate rental fee when returning the movie
-    ! Calculate the number of days using the date_in and date_out values
-
-*/
-
 class Rentals {
   async getAllRentals() {
     try {
       const [result] = await connection.query("SELECT* FROM rentals");
       return result;
     } catch (ex) {
-      console.log("Something failed", ex);
+      throw ex;
     }
   }
 
@@ -30,7 +23,7 @@ class Rentals {
       );
       return result;
     } catch (ex) {
-      console.log("Something failed", ex);
+      throw ex;
     }
   }
 
@@ -42,7 +35,7 @@ class Rentals {
       );
       return result[0];
     } catch (ex) {
-      console.log("An error occured in the database", ex);
+      throw ex;
     }
   }
 
@@ -54,7 +47,7 @@ class Rentals {
       );
       return result[0];
     } catch (ex) {
-      console.log("An error occured in the database", ex);
+      throw ex;
     }
   }
 
@@ -65,14 +58,6 @@ class Rentals {
     });
     return schema.validate(rental);
   }
-
-  //   validateReturn(rental) {
-  //     const schema = Joi.object({
-  //       customerId: Joi.number().min(1).required(),
-  //       movieId: Joi.number().min(1).required(),
-  //     });
-  //     return schema.validate(rental);
-  //   }
 }
 
 module.exports = new Rentals();
