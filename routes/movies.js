@@ -5,19 +5,19 @@ const router = express.Router();
 //? Import the Movies Model
 const moviesModel = require("../SQL/moviesModel");
 
-//? Import third party libraries
+//? Import third party libraries and middleware
 const lodash = require("lodash");
+const authorization = require("../middleware/authorization");
 
 //? Add routes:
-
 //GET
-router.get("/", async (req, res) => {
+router.get("/", authorization, async (req, res) => {
   const movies = await moviesModel.getAllMovies();
   res.send(movies);
 });
 
 //GET one
-router.get("/:id", async (req, res) => {
+router.get("/:id", authorization, async (req, res) => {
   const movie = await moviesModel.getMovieById(req.params.id);
   if (movie.length === 0)
     return res.status(404).send("There is no movie under the provided id");

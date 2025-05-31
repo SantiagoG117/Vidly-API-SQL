@@ -10,6 +10,8 @@ const lodash = require("lodash");
 const bcrypt = require("bcrypt");
 
 //? Routes
+
+//User registration:
 router.post("/", async (req, res) => {
   const { error } = Users.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -36,7 +38,6 @@ router.post("/", async (req, res) => {
   const token = await Users.generateAuthToken(user.email);
 
   /* 
-    TODO
     When the user registers, log them into the application automatically.
     Return the JSON Web Token as a header so the client can store it and
     user it in the future

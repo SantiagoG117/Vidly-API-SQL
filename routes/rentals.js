@@ -7,18 +7,18 @@ const Rentals = require("../SQL/rentalsModel");
 const Movies = require("../SQL/moviesModel");
 const Customers = require("../SQL/customersModel");
 
-//? Third party libraries
+//? Middlewares
+const authorization = require("../middleware/authorization");
 
 //? Routes
-
 //GET
-router.get("/", async (req, res) => {
+router.get("/", authorization, async (req, res) => {
   const rentals = await Rentals.getAllRentals();
   res.send(rentals);
 });
 
 //POST
-router.post("/", async (req, res) => {
+router.post("/", authorization, async (req, res) => {
   // Validate the object
   const { error } = Rentals.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -42,13 +42,14 @@ router.post("/", async (req, res) => {
 });
 
 //PUT
-router.put("/", async (req, res) => {
+router.put("/", authorization, async (req, res) => {
   // TODO Build logic for lost movies
 
   //Validate the customerID and movieID
   const customer = await Customers.getCustomer(req.body.customerId);
   const [movie] = await Movies.getMovieByBarcode(req.body.barcode);
   if (!customer || !movie) return res.status(404).send("Invalid request");
+
 
   //Verify that the movie has not already been returned
   let [rental] = await Rentals.getActiveRentals(
@@ -58,8 +59,7 @@ router.put("/", async (req, res) => {
   if (rental) return res.send(`Movie has already been returned`);
 
   //Update the rental
-  rental = await Rentals.createReturn(req.params.customerId, movie.movie_id);
-
+  rental = await Rentals.createReturn(req.body.customerId, movie.movie_id);
   res.send(rental);
 });
 

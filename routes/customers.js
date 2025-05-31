@@ -5,19 +5,20 @@ const router = express.Router();
 //? Import customers model
 const Customers = require("../SQL/customersModel");
 
-//? Third party libraries
+//? Third party libraries and middleware
 const lodash = require("lodash");
+const authorization = require("../middleware/authorization");
 
 //? Routes
 
 //GET
-router.get("/", async (req, res) => {
+router.get("/", authorization, async (req, res) => {
   const customers = await Customers.getAllCustomers();
   res.send(customers);
 });
 
 //POST
-router.post("/", async (req, res) => {
+router.post("/", authorization, async (req, res) => {
   //Validate the body of the request
   const { error } = Customers.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -44,7 +45,7 @@ router.post("/", async (req, res) => {
 });
 
 //PUT
-router.put("/:id", async (req, res) => {
+router.put("/:id", authorization, async (req, res) => {
   // Validate the client's input
   const { error } = Customers.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
