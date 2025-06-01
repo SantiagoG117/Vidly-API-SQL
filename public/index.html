@@ -3,65 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vidly - Login/Register</title>
+    <title>Blockbuster - Login/Register</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <style>
-      body {
-        min-height: 100vh;
-        background: #f8f9fa;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-image: url("../resources/background_image.jpg");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-      }
-      .auth-box {
-        width: 100%;
-        max-width: 400px;
-        width: 100%;
-        max-width: 400px;
-        /* Two-color split: left btn-warning, right btn-primary */
-        background: linear-gradient(
-          to right,
-          #ffc107 0%,
-          #ffc107 50%,
-          #0d6efd 50%,
-          #0d6efd 100%
-        );
-        border-radius: 8px;
-        box-shadow: 0 0 16px rgba(0, 0, 0, 0.08);
-        padding: 2rem;
-      }
-      .switch-btns .btn {
-        width: 50%;
-      }
-      .split-btn {
-        background: linear-gradient(
-          to right,
-          #0d6efd 0%,
-          #0d6efd 50%,
-          #ffc107 50%,
-          #ffc107 100%
-        ) !important;
-        color: #fff !important;
-        border: none !important;
-        position: relative;
-        z-index: 1;
-        transition: none;
-      }
-      .split-btn:focus,
-      .split-btn:hover {
-        filter: brightness(0.95);
-      }
-    </style>
+    <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
     <div class="auth-box mx-auto">
+      <!-- Alert -->
+      <div id="alertContainer"></div>
       <div class="switch-btns d-flex mb-4">
         <button
           class="btn btn-primary m-1"
@@ -154,6 +106,11 @@
       document
         .getElementById("registerForm")
         .addEventListener("submit", registerUser);
+
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", loginUser);
+
       function showForm(form) {
         const loginBtn = document.getElementById("showLogin");
         const registerBtn = document.getElementById("showRegister");
@@ -172,7 +129,7 @@
       }
 
       async function registerUser(event) {
-        event.preventDefault();
+        event.preventDefault(); //Stops browser from reloading the page when the form is subimtted
 
         //Get values from the form:
         const firstName = document.getElementById("registerFirstName").value;
@@ -203,20 +160,74 @@
 
           if (!response.ok) {
             const errorText = await response.text();
-            alert("Registration failed: " + errorText);
+            const alertContainer = document.getElementById("alertContainer");
+            alertContainer.innerHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              ${errorText}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            `;
             return;
           }
 
           //Store the JSON Web token sent by the server
           const token = response.headers.get("x-auth-token");
-          console.log(response);
-          console.log(token);
+
           if (token) {
             localStorage.setItem("token", token);
             window.location.href = "home.html";
-          } else {
-            alert("Registration succeed but no token received");
+          } else alert("Registration succeed but no token received");
+        } catch (err) {
+          alert(err.message);
+        }
+      }
+
+      async function loginUser(event) {
+        event.preventDefault(); //Stops browser from reloading the page when the form is submitted
+
+        //Get the values from the form
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        //Build payload
+        const payload = {
+          email,
+          password,
+        };
+
+        // Send POST request:
+        try {
+          const response = await fetch("http://localhost:5000/api/login/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            const alertContainer = document.getElementById("alertContainer");
+            alertContainer.innerHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              ${errorText}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            `;
+            return;
           }
+
+          //Store the JSON Web token sent by the server
+          const token = response.headers.get("x-auth-token");
+          if (token) {
+            /* 
+              Local Storage is a built-in web API that let's us save key-value pairs in the user's browser.
+              The data persists even after the browser is closed or the page is reloaded. 
+              We use this storage to keep our JSON Web token
+            */
+            localStorage.setItem("token", token);
+            window.location.href = "home.html";
+          } else alert("Registration succeed but no token was received");
         } catch (err) {
           alert(err.message);
         }

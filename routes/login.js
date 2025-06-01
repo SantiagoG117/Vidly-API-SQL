@@ -31,7 +31,7 @@ router.post("/", async (req, res) => {
 
   //Return a JSON Web token for the loged in user
   const token = await Users.generateAuthToken(user.email);
-  res.send(token);
+  res.header("x-auth-token", token).send();
 });
 
 //? Client side validation
