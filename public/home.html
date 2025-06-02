@@ -118,7 +118,9 @@
               </a>
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#">Modify profile</a></li>
-                <li><a class="dropdown-item" href="#">Log out</a></li>
+                <li>
+                  <a class="dropdown-item" href="#" id="logOut">Log out</a>
+                </li>
               </ul>
             </li>
           </ul>
@@ -478,6 +480,12 @@
         } catch (ex) {
           alert(ex);
         }
+      });
+
+      //Logout
+      $("#logOut").on("click", () => {
+        localStorage.removeItem("token");
+        window.location.href = "index.html";
       });
     </script>
   </body>
