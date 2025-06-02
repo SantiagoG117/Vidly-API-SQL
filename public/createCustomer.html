@@ -80,8 +80,11 @@
                 Admins
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Mange Movies</a></li>
-                <li><a class="dropdown-item" href="#">Manage Employees</a></li>
+                <li>
+                  <a class="dropdown-item" href="./manageMovies.html"
+                    >Mange Movies</a
+                  >
+                </li>
               </ul>
             </li>
             <li class="nav-item dropdown">
@@ -197,7 +200,7 @@
         $("#email").val("");
         $("#phoneNumber").val("");
       });
-      
+
       //Logout
       $("#logOut").on("click", () => {
         localStorage.removeItem("token");

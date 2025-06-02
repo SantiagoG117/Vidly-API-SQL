@@ -64,6 +64,7 @@
     <!-- Alert -->
     <div id="alertContainer"></div>
     <!-- Bootstrap Navbar -->
+    <!-- Bootstrap Navbar -->
     <nav class="navbar navbar-expand-lg mb-4" style="background-color: #020381">
       <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="./home.html">
@@ -95,11 +96,6 @@
                 <li>
                   <a class="dropdown-item" href="./manageMovies.html"
                     >Mange Movies</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./manageEmployees.html"
-                    >Manage Employees</a
                   >
                 </li>
               </ul>
@@ -489,6 +485,11 @@
           alert("Error: " + ex.message);
         }
       });
+    });
+    //Logout
+    $("#logOut").on("click", () => {
+      localStorage.removeItem("token");
+      window.location.href = "index.html";
     });
   </script>
 </html>
