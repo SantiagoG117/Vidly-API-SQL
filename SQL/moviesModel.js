@@ -7,7 +7,15 @@ const Joi = require("joi");
 class Movies {
   async getAllMovies() {
     try {
-      const [result] = await connection.query(`SELECT* FROM movies;`);
+      const [result] = await connection.query(`
+        SELECT
+	        title,
+          barcode,
+          daily_rental_rate,
+          number_in_stock,
+          genres.name as genre
+        FROM movies
+        JOIN genres on movies.genre_id = genres.genre_id;`);
       return result;
     } catch (ex) {
       throw ex;

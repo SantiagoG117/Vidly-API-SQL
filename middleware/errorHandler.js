@@ -6,7 +6,7 @@ const winston = require("winston");
     a response with a status 500 indicating an internal server error.
 */
 function errorHandler(err, req, res, next) {
-  winston.error(err.message);
+  winston.error(err.message, err);
   return res
     .status(500)
     .send("Something failed on our side. Please try again later");

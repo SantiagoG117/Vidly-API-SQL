@@ -14,13 +14,13 @@ class Customers {
     }
   }
 
-  async getCustomer(customerId) {
+  async getCustomer(phoneNumber) {
     try {
       const [result] = await connection.query(
-        `SELECT* FROM customers WHERE customer_id = ?`,
-        [customerId]
+        `SELECT* FROM customers where phone =  ?`,
+        [phoneNumber]
       );
-      return result;
+      return result[0];
     } catch (ex) {
       throw ex;
     }

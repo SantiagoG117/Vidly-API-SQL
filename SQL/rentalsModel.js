@@ -19,7 +19,7 @@ class Rentals {
       const [result] = await connection.query(
         `SELECT* 
          FROM rentals 
-         WHERE customer_id = ${customerId} AND movie_id = ${movieId} AND is_returned IS NOT NULL;`
+         WHERE customer_id = ${customerId} AND movie_id = ${movieId} AND is_returned IS NULL;`
       );
       return result;
     } catch (ex) {
@@ -53,7 +53,7 @@ class Rentals {
 
   validate(rental) {
     const schema = Joi.object({
-      customerId: Joi.number().min(1).required(),
+      phoneNumber: Joi.number().min(1).required(),
       barcode: Joi.string().min(10).max(10).required(),
     });
     return schema.validate(rental);

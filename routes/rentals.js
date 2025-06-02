@@ -27,12 +27,17 @@ router.post(
   "/",
   authorization,
   asyncMiddleware(async (req, res) => {
+    /* 
+      TODO: Possible, instead of receiving the customer id, receive their
+      !phone number and find customer by phone number
+    */
+
     // Validate the object
     const { error } = Rentals.validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
     // Validate customerID and movie ID
-    const customer = await Customers.getCustomer(req.body.customerId);
+    const customer = await Customers.getCustomer(req.body.phoneNumber);
     const [movie] = await Movies.getMovieByBarcode(req.body.barcode);
     if (!customer || !movie) return res.status(404).send("Invalid request");
 
@@ -43,7 +48,7 @@ router.post(
 
     //Create the rental
     const rental = await Rentals.createRental(
-      req.body.customerId,
+      customer.customer_id,
       movie.movie_id,
       req.body.barcode
     );
@@ -56,23 +61,21 @@ router.put(
   "/",
   authorization,
   asyncMiddleware(async (req, res) => {
-    // TODO Build logic for lost movies
-
-    //Validate the customerID and movieID
-    const customer = await Customers.getCustomer(req.body.customerId);
+    //Validate the customer and movie
+    const customer = await Customers.getCustomer(req.body.phoneNumber);
     const [movie] = await Movies.getMovieByBarcode(req.body.barcode);
     if (!customer || !movie) return res.status(404).send("Invalid request");
 
     //Verify that the movie has not already been returned
-    let [rental] = await Rentals.getActiveRentals(
-      req.body.customerId,
+    let [activeRentals] = await Rentals.getActiveRentals(
+      customer.customer_id,
       movie.movie_id
     );
-    if (rental) return res.send(`Movie has already been returned`);
+    if (!activeRentals) return res.status(404).send(`Customer has no active rentals`);
 
     //Update the rental
-    rental = await Rentals.createReturn(req.body.customerId, movie.movie_id);
-    res.send(rental);
+    activeRentals = await Rentals.createReturn(customer.customer_id, movie.movie_id);
+    res.send(activeRentals);
   })
 );
 
