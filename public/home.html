@@ -38,23 +38,15 @@
       .modal-body {
         background-color: #3d65ba;
       }
-      /* Reduce margin between pagination numbers even more */
-      .dataTables_paginate .pagination .page-item {
-        margin-left: 0;
-        margin-right: 0;
-      }
 
-      /* Optional: Remove left margin from the first page-item */
       .dataTables_paginate .pagination .page-item:first-child {
         margin-left: 0;
       }
 
-      /* Optional: Reduce horizontal padding inside page links */
       .dataTables_paginate .pagination .page-link {
         padding-left: 0.5rem;
         padding-right: 0.5rem;
       }
-
       /* Add spacing to the show entries dropdown */
       .dataTables_length label {
         display: flex;
@@ -62,7 +54,6 @@
         gap: 0.5rem;
         margin-bottom: 1rem;
       }
-
       /* Prevent overlap between select and text */
       .dataTables_length select {
         margin: 0 0.25rem;
@@ -102,8 +93,16 @@
                 Admins
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Mange Movies</a></li>
-                <li><a class="dropdown-item" href="#">Manage Employees</a></li>
+                <li>
+                  <a class="dropdown-item" href="./manageMovies.html"
+                    >Mange Movies</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./manageEmployees.html"
+                    >Manage Employees</a
+                  >
+                </li>
               </ul>
             </li>
             <li class="nav-item dropdown">
@@ -117,7 +116,6 @@
                 User
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Modify profile</a></li>
                 <li>
                   <a class="dropdown-item" href="#" id="logOut">Log out</a>
                 </li>
@@ -127,24 +125,22 @@
         </div>
       </div>
     </nav>
-    <div>
-      <!-- Data Table: -->
-      <div class="container-fluid">
-        <table id="moviesTable" class="table table-striped table-bordered">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Barcode</th>
-              <th>Daily Rental Rate</th>
-              <th>Number in Stock</th>
-              <th>Genre</th>
-              <th>Rent</th>
-              <th>Return</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <!-- Data Table: -->
+    <div class="container-fluid">
+      <table id="moviesTable" class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Barcode</th>
+            <th>Daily Rental Rate</th>
+            <th>Number in Stock</th>
+            <th>Genre</th>
+            <th>Rent</th>
+            <th>Return</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
     <!-- Rent Movie Modal -->
     <div
@@ -308,12 +304,6 @@
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
     <script>
-      /*
-        TODO:
-          Implement log out: Delete JSON Web token and redirect the user to index
-
-      */
-
       $(document).ready(function () {
         // DataTable logic:
         $("#moviesTable").DataTable({

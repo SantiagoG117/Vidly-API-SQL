@@ -51,6 +51,7 @@
   </head>
   <body>
     <!-- Bootstrap Navbar -->
+    <!-- Bootstrap Navbar -->
     <nav class="navbar navbar-expand-lg mb-4" style="background-color: #020381">
       <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="./home.html">
@@ -94,8 +95,9 @@
                 User
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Modify profile</a></li>
-                <li><a class="dropdown-item" href="#">Log out</a></li>
+                <li>
+                  <a class="dropdown-item" href="#" id="logOut">Log out</a>
+                </li>
               </ul>
             </li>
           </ul>
@@ -161,7 +163,6 @@
         if (!token) window.location.href = "index.html";
 
         //Send POST request:
-
         const response = await fetch("http://localhost:5000/api/customers/", {
           method: "POST",
           headers: {
@@ -195,6 +196,12 @@
         $("#lastName").val("");
         $("#email").val("");
         $("#phoneNumber").val("");
+      });
+      
+      //Logout
+      $("#logOut").on("click", () => {
+        localStorage.removeItem("token");
+        window.location.href = "index.html";
       });
     </script>
   </body>

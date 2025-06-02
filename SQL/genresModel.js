@@ -17,11 +17,11 @@ class Genres {
     }
   }
 
-  async getGenre(id) {
+  async getGenre(name) {
     try {
       const [result] = await connection.query(
-        `SELECT* FROM genres WHERE genre_id = ?;`,
-        [id] //Parameterized query
+        `SELECT* FROM genres WHERE name = ?;`,
+        [name]
       );
       return result;
     } catch (ex) {

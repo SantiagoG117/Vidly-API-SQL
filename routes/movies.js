@@ -4,6 +4,7 @@ const router = express.Router();
 
 //? Import the Movies Model
 const moviesModel = require("../SQL/moviesModel");
+const genresModel = require("../SQL/genresModel");
 
 //? Import third party libraries and middleware
 const lodash = require("lodash");
@@ -27,7 +28,7 @@ router.get(
   "/:id",
   authorization,
   asyncMiddleware(async (req, res) => {
-    const movie = await moviesModel.getMovieById(req.params.id);
+    const movie = await moviesModel.getMovieByBarcode(req.params.id);
     if (movie.length === 0)
       return res.status(404).send("There is no movie under the provided id");
 
@@ -68,7 +69,7 @@ router.post(
 
 //PUT
 router.put(
-  "/:id",
+  "/:barcode",
   [authorization, isAdmin],
   asyncMiddleware(async (req, res) => {
     //Validate the object
@@ -76,17 +77,20 @@ router.put(
     if (error) return res.status(400).send(error.details[0].message);
 
     // Verify that the movie exist and the id is valid
-    const [validID] = await moviesModel.getMovieById(req.params.id);
+    const [movie] = await moviesModel.getMovieByBarcode(req.params.barcode);
+    // Get the genre id
+    const [genre] = await genresModel.getGenre(req.body.genre);
 
-    if (!validID)
+    console.log(genre);
+    if (!movie || !genre)
       return res
         .status(404)
-        .send("The provided movie id does not exists in our servers");
+        .send("The provided movie or genre does not exists in our servers");
 
     //Update the movie
     const [result] = await moviesModel.updateMovie(
-      req.params.id,
-      req.body.genreId,
+      movie.movie_id,
+      genre.genre_id,
       req.body.barcode,
       req.body.title,
       req.body.dailyRentalRate,
@@ -101,18 +105,18 @@ router.put(
 
 // DELETE
 router.delete(
-  "/:id",
+  "/:barcode",
   [authorization, isAdmin],
   asyncMiddleware(async (req, res) => {
     //Verify the movie exists
-    let [result] = await moviesModel.getMovieById(req.params.id);
+    let [movie] = await moviesModel.getMovieByBarcode(req.params.barcode);
 
-    if (!result)
+    if (!movie)
       return res.status(404).send("There is no movie under the provided id");
 
     //Delete the movie
-    [result] = await moviesModel.deleteMovie(req.params.id);
-    res.send(result);
+    [movie] = await moviesModel.deleteMovie(movie.movie_id);
+    res.send(movie);
   })
 );
 

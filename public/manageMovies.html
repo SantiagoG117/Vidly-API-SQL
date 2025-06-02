@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- DataTables CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css"
+    />
+    <!-- DataTables Bootstrap 5 CSS (optional, for Bootstrap styling) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .dropdown-menu {
+        background-color: #ffa900;
+      }
+      .dropdown-menu .dropdown-item {
+        color: #fff;
+      }
+      .dropdown-menu .dropdown-item:hover,
+      .dropdown-menu .dropdown-item:focus {
+        background-color: #ffd466;
+        color: #0d3fa9;
+      }
+      .modal-header,
+      .modal-footer {
+        background-color: #ffba33;
+      }
+
+      .modal-body {
+        background-color: #3d65ba;
+      }
+      .dataTables_paginate .pagination .page-item:first-child {
+        margin-left: 0;
+      }
+
+      .dataTables_paginate .pagination .page-link {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+      /* Add spacing to the show entries dropdown */
+      .dataTables_length label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      /* Prevent overlap between select and text */
+      .dataTables_length select {
+        margin: 0 0.25rem;
+        min-width: 60px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Alert -->
+    <div id="alertContainer"></div>
+    <!-- Bootstrap Navbar -->
+    <nav class="navbar navbar-expand-lg mb-4" style="background-color: #020381">
+      <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="./home.html">
+          <img
+            src="../resources/blockbuster-logo.svg"
+            class="img-fluid"
+            style="max-width: 300px; height: auto"
+            alt="Blockbuster Logo"
+          />
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link text-white" href="./createCustomer.html"
+                >Create Customer</a
+              >
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle text-white"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Admins
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="./manageMovies.html"
+                    >Mange Movies</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./manageEmployees.html"
+                    >Manage Employees</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle text-white"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                User
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="#" id="logOut">Log out</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Data table -->
+    <div class="container-fluid">
+      <table id="moviesTable">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Barcode</th>
+            <th>Daily Rental Rate</th>
+            <th>Number in Stock</th>
+            <th>Genre</th>
+            <th>Update</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+      </table>
+      <tbody></tbody>
+    </div>
+
+    <!-- DELETE Confirmation modal -->
+    <div
+      class="modal fade"
+      id="deleteMovieModal"
+      tabindex="-1"
+      aria-labelledby="deleteMovieModal"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteMovieModalLabel">
+              Do you want permanently delete this movie?
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="deleteMovieForm">
+              <div class="mb-3">
+                <label for="title" class="form-label text-white">
+                  Movie's Title
+                </label>
+                <input type="text" class="form-control" id="title" readonly />
+              </div>
+              <div class="mb-3">
+                <label for="barcode" class="form-label text-white"
+                  >Movie's Barcode</label
+                >
+                <input type="text" class="form-control" id="barcode" readonly />
+              </div>
+              <div class="mb-3">
+                <label for="dailyRentalRate" class="form-label text-white">
+                  Daily Rental Rate
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="dailyRentalRate"
+                  readonly
+                />
+              </div>
+              <div class="mb-3">
+                <label for="numberInStock" class="form-label text-white">
+                  Number in Stock
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="numberInStock"
+                  readonly
+                />
+              </div>
+              <div class="mb-3">
+                <label for="genre" class="form-label text-white"> Genre</label>
+                <input type="text" class="form-control" id="genre" readonly />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">
+              Cancel
+            </button>
+            <button type="submit" form="deleteMovieForm" class="btn btn-danger">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPDATE Movie Modal -->
+    <div
+      class="modal fade"
+      id="updateMovieModal"
+      tabindex="-1"
+      aria-labelledby="updateMovieModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateMovieModalLabel">Update Movie</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="updateMovieForm">
+              <div class="mb-3">
+                <label for="updateTitle" class="form-label text-white">
+                  Movie's Title
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="updateTitle"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="updateBarcode" class="form-label text-white">
+                  Movie's Barcode
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="updateBarcode"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label
+                  for="updateDailyRentalRate"
+                  class="form-label text-white"
+                >
+                  Daily Rental Rate
+                </label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="updateDailyRentalRate"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="updateNumberInStock" class="form-label text-white">
+                  Number in Stock
+                </label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="updateNumberInStock"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="updateGenre" class="form-label text-white">
+                  Genre
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="updateGenre"
+                  required
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="updateMovieForm"
+              class="btn btn-primary"
+            >
+              Update
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- DataTables JS -->
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <!-- DataTables Bootstrap 5 JS (optional, for Bootstrap styling) -->
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+  <script>
+    $(document).ready(() => {
+      //Data Table
+      $("#moviesTable").DataTable({
+        ajax: {
+          url: "http://localhost:5000/api/movies/",
+          dataSrc: "",
+          beforeSend: (req) => {
+            const token = localStorage.getItem("token");
+            if (token) req.setRequestHeader("x-auth-token", token);
+            else window.location.href = "index.html";
+          },
+        },
+        columns: [
+          { data: "title" },
+          { data: "barcode" },
+          { data: "daily_rental_rate" },
+          { data: "number_in_stock" },
+          { data: "genre" },
+          {
+            data: null,
+            orderable: false,
+            render: (data, type, req) => {
+              return `<button class="btn btn-primary btn-sm js-update">Update</button>`;
+            },
+          },
+          {
+            data: null,
+            orderable: false,
+            render: (data, type, req) => {
+              return `<button class="btn btn-danger btn-sm js-delete">Delete</button>`;
+            },
+          },
+        ],
+      });
+
+      //Update movie:
+      $("#moviesTable").on("click", ".js-update", function () {
+        //Get the movie information
+        const table = $("#moviesTable").DataTable();
+        const movie = table.row($(this).closest("tr")).data();
+        console.log(movie);
+        //Prepopulate the input fields
+        $("#updateTitle").val(movie.title);
+        $("#updateBarcode").val(movie.barcode);
+        $("#updateDailyRentalRate").val(movie.daily_rental_rate);
+        $("#updateNumberInStock").val(movie.number_in_stock);
+        $("#updateGenre").val(movie.genre);
+
+        //Display the modal:
+        const modal = new bootstrap.Modal(
+          document.getElementById("updateMovieModal")
+        );
+        modal.show();
+      });
+
+      $("#updateMovieForm").on("submit", async function (event) {
+        event.preventDefault();
+        const barcode = $("#updateBarcode").val();
+        const title = $("#updateTitle").val();
+        const dailyRentalRate = $("#updateDailyRentalRate").val();
+        const numberInStock = $("#updateNumberInStock").val();
+        const genre = $("#updateGenre").val();
+
+        const payload = {
+          barcode,
+          title,
+          dailyRentalRate,
+          numberInStock,
+          genre,
+        };
+
+        const token = localStorage.getItem("token");
+        if (!token) window.location.href = "index.html";
+
+        try {
+          const response = await fetch(
+            "http://localhost:5000/api/movies/" + barcode,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "x-auth-token": token,
+              },
+              body: JSON.stringify(payload),
+            }
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            const alertContainer = document.getElementById("alertContainer");
+            alertContainer.innerHTML = `
+              <div class="alert alert-danger alert-dismissible fade show m-0" role="alert">
+                ${errorText}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+              `;
+            return;
+          }
+
+          //Close the modal and reload the daata table
+          bootstrap.Modal.getInstance(
+            document.getElementById("updateMovieModal")
+          ).hide();
+          $("#moviesTable").DataTable().ajax.reload();
+        } catch (ex) {
+          alert(ex);
+        }
+      });
+
+      // Delete movie:
+      $("#moviesTable").on("click", ".js-delete", function () {
+        //Get the movie information
+        const table = $("#moviesTable").DataTable();
+        const movie = table.row($(this).closest("tr")).data();
+        //Prepopulate the input fields
+        $("#title").val(movie.title);
+        $("#barcode").val(movie.barcode);
+        $("#dailyRentalRate").val(movie.daily_rental_rate);
+        $("#numberInStock").val(movie.number_in_stock);
+        $("#genre").val(movie.genre);
+
+        //Display modal
+        //Show the modal
+        const modal = new bootstrap.Modal(
+          document.getElementById("deleteMovieModal")
+        );
+        modal.show();
+      });
+
+      $("#deleteMovieForm").on("submit", async function (event) {
+        event.preventDefault();
+        const barcode = $("#barcode").val();
+        const token = localStorage.getItem("token");
+        if (!token) window.location.href = "index.html";
+        try {
+          const response = await fetch(
+            "http://localhost:5000/api/movies/" + barcode,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                "x-auth-token": token,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            const alertContainer = document.getElementById("alertContainer");
+            alertContainer.innerHTML = `
+            <div class="alert alert-danger alert-dismissible fade show m-0" role="alert">
+              ${errorText}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            `;
+            return;
+          }
+
+          //Close the modal and reload the daata table
+          bootstrap.Modal.getInstance(
+            document.getElementById("deleteMovieModal")
+          ).hide();
+          $("#moviesTable").DataTable().ajax.reload();
+        } catch (ex) {
+          alert("Error: " + ex.message);
+        }
+      });
+    });
+  </script>
+</html>
